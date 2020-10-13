@@ -1,28 +1,28 @@
 use core::cell::UnsafeCell;
 
-struct MyCell<T> {
+pub struct MyCell<T> {
     value: UnsafeCell<T>,
 }
 
 impl<T> MyCell<T> where T : Copy {
-    fn new(value: T) -> Self {
+    pub fn new(value: T) -> Self {
         MyCell {
             value: UnsafeCell::new(value),
         }
     }
 
-    fn get(&self) -> T
+    pub fn get(&self) -> T
     {
         unsafe { *self.value.get().clone() }
     }
 
-    fn set(&self, value: T) {
+    pub fn set(&self, value: T) {
         {
             unsafe { *self.value.get() = value }
         }
     }
 
-    fn replace(&self, value: T) -> T {
+    pub fn replace(&self, value: T) -> T {
         unsafe {
             let original_value = *self.value.get().clone();
             *self.value.get() = value;
