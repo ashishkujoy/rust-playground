@@ -103,7 +103,7 @@ impl<T> Deref for MyMutRef<'_, T> {
     }
 }
 
-impl <T> DerefMut for MyMutRef<'_, T> {
+impl<T> DerefMut for MyMutRef<'_, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         unsafe { &mut *self._refcell.value.get() }
     }
@@ -118,7 +118,6 @@ impl<T> Drop for MyMutRef<'_, T> {
         }
     }
 }
-
 
 #[cfg(test)]
 mod test {

@@ -1,6 +1,7 @@
 mod cell;
-mod refcell;
 mod rc;
+mod refcell;
+mod list;
 
 #[cfg(test)]
 mod tests {
@@ -8,7 +9,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let cell  = Cell::new(43);
+        let cell = Cell::new(43);
         cell.swap(&Cell::new(34));
         assert_eq!(2 + 2, 4);
     }

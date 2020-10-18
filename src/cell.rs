@@ -4,15 +4,17 @@ pub struct MyCell<T> {
     value: UnsafeCell<T>,
 }
 
-impl<T> MyCell<T> where T : Copy {
+impl<T> MyCell<T>
+where
+    T: Copy,
+{
     pub fn new(value: T) -> Self {
         MyCell {
             value: UnsafeCell::new(value),
         }
     }
 
-    pub fn get(&self) -> T
-    {
+    pub fn get(&self) -> T {
         unsafe { *self.value.get().clone() }
     }
 
