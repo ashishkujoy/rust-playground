@@ -21,6 +21,20 @@ impl<T> Iterator for List<T> {
     }
 }
 
+struct Iter<'t, T> {
+    next: Option<&'t Node<T>>,
+}
+
+impl<'t, T> Iterator for Iter<'t, T> {
+    type Item = &'t T;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.next.map(|node| {
+            self.next = node.next.as_ref().map(|node| &**node);
+            &node.element
+        })
+    }
+}
+
 struct Node<T> {
     element: T,
     next: Option<Box<Node<T>>>,
@@ -57,6 +71,12 @@ impl<T> List<T> {
 
     fn peek_mut(&mut self) -> Option<&mut T> {
         self.head.as_mut().map(|node| &mut node.element)
+    }
+
+    fn into_iter(&self) -> Iter<'_, T> {
+        Iter {
+            next: self.head.as_ref().map(|node| &**node)
+        }
     }
 }
 
@@ -103,5 +123,19 @@ mod test {
         list.peek_mut().map(|number| *number = 56);
 
         assert_eq!(list.peek(), Some(&56));
+    }
+
+    #[test]
+    fn list_to_iter() {
+        let mut list = List::new();
+        list.push(2);
+        list.push(3);
+        let immuatable_list = list;
+
+        let mut iter = immuatable_list.into_iter();
+
+        assert_eq!(iter.next(), Some(3));
+        assert_eq!(iter.next(), Some(2));
+        assert_eq!(iter.next(), None);
     }
 }
