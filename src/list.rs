@@ -35,6 +35,21 @@ impl<'t, T> Iterator for Iter<'t, T> {
     }
 }
 
+struct IterMut<'t, T> {
+    next: Option<&'t mut Node<T>>,
+}
+
+impl<'t, T> Iterator for IterMut<'t, T> {
+    type Item = &'t mut T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.next.take().map(|node| {
+            self.next = node.next.as_mut().map(|node| &mut **node);
+            &mut node.element
+        })
+    }
+}
+
 struct Node<T> {
     element: T,
     next: Option<Box<Node<T>>>,
@@ -75,7 +90,13 @@ impl<T> List<T> {
 
     fn into_iter(&self) -> Iter<'_, T> {
         Iter {
-            next: self.head.as_ref().map(|node| &**node)
+            next: self.head.as_ref().map(|node| &**node),
+        }
+    }
+
+    fn into_iter_mut(&mut self) -> IterMut<'_, T> {
+        IterMut {
+            next: self.head.as_mut().map(|node| &mut **node),
         }
     }
 }
@@ -137,5 +158,16 @@ mod test {
         assert_eq!(iter.next(), Some(3));
         assert_eq!(iter.next(), Some(2));
         assert_eq!(iter.next(), None);
+    }
+
+    #[test]
+    fn list_to_iter_mut() {
+        let mut list = List::new();
+        list.push(1);
+        list.push(2);
+        let mut iter = list.into_iter_mut();
+        iter.next().map(|e| *e = 45);
+
+        assert_eq!(list.pop(), Some(45));
     }
 }
