@@ -3,6 +3,7 @@ mod rc;
 mod refcell;
 mod list;
 mod list2;
+pub mod server;
 
 #[cfg(test)]
 mod tests {
