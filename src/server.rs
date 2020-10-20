@@ -1,4 +1,5 @@
 
+use crate::http::HttpRequest;
 use std::net::{TcpListener, TcpStream};
 use std::error::Error;
 use std::io::prelude::*;
@@ -16,12 +17,16 @@ impl Server {
     pub fn start<H>(&self, handler: H) -> Result<(), Box<dyn Error>> where H : TcpRequestHandler{
         let listener = TcpListener::bind(format!("{}:{}", self.host, self.port))?;
         for stream in listener.incoming() {
-            handler.handle_request(stream.unwrap())
+            let mut stream = stream.unwrap();
+            let mut buffer = [0; 1024];
+            stream.read(&mut buffer);
+            let req = String::from_utf8_lossy(&buffer[..]).to_string();
+            handler.handle_request(HttpRequest::parse(req).unwrap())
         }
         Ok(())
     }
 }
 
 pub trait TcpRequestHandler {
-    fn handle_request(&self, stream: TcpStream) -> ();
+    fn handle_request(&self, http_request: HttpRequest) -> ();
 }

@@ -1,5 +1,5 @@
 use std::{net::TcpStream, process};
-use quick_bytes::server::{Server, TcpRequestHandler};
+use quick_bytes::{http::HttpRequest, server::{Server, TcpRequestHandler}};
 
 
 fn main() {
@@ -16,7 +16,7 @@ fn main() {
 
 struct DummyHandler {}
 impl TcpRequestHandler for DummyHandler {
-    fn handle_request(&self, stream: TcpStream) -> () {
+    fn handle_request(&self, http_request: HttpRequest) -> () {
         
     }
 }
