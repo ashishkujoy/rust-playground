@@ -2,6 +2,7 @@ mod cell;
 mod rc;
 mod refcell;
 mod list;
+mod list2;
 
 #[cfg(test)]
 mod tests {
