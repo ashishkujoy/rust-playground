@@ -16,9 +16,8 @@ impl HttpRequest {
 
     pub(crate) fn parse(request: String) -> Result<HttpRequest, HttpParseError> {
         let request_line = request.split("\r\n").take(1).next().unwrap();
-
         let mut tokens = request_line.split(" ");
-        tokens.next();
+        
         let method = match tokens.next() {
             Some("GET") => HttpMethod::GET,
             Some("POST") => HttpMethod::POST,
@@ -74,7 +73,7 @@ mod test {
 
     #[test]
     fn parse_request_method_and_path() {
-        let raw_request = "Request: POST /helloworld HTTP/1.1\n\r";
+        let raw_request = "POST /helloworld HTTP/1.1\n\r";
         let request = HttpRequest::parse(raw_request.to_string()).unwrap();
 
         assert_eq!(request.method, HttpMethod::POST);
@@ -83,7 +82,7 @@ mod test {
 
     #[test]
     fn give_error_for_unknown_method() {
-        let raw_request = "Request: FOO /helloworld HTTP/1.1\r\n";
+        let raw_request = "FOO /helloworld HTTP/1.1\r\n";
         let request = HttpRequest::parse(raw_request.to_string());
 
         assert_eq!(
@@ -109,7 +108,7 @@ mod test {
 
     #[test]
     fn give_error_for_missing_request_uri() {
-        let raw_request = "Request: POST\r\n";
+        let raw_request = "POST\r\n";
         let request = HttpRequest::parse(raw_request.to_string());
 
         assert_eq!(

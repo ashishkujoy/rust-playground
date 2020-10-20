@@ -18,5 +18,7 @@ fn main() {
 
 struct DummyHandler {}
 impl TcpRequestHandler for DummyHandler {
-    fn handle_request(&self, http_request: HttpRequest) -> () {}
+    fn handle_request(&self, http_request: HttpRequest) -> () {
+        println!("{:?}", http_request)
+    }
 }

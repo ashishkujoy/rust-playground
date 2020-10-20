@@ -23,7 +23,8 @@ impl Server {
             let mut buffer = [0; 1024];
             stream.read(&mut buffer);
             let req = String::from_utf8_lossy(&buffer[..]).to_string();
-            handler.handle_request(HttpRequest::parse(req).unwrap())
+            handler.handle_request(HttpRequest::parse(req).unwrap());
+            stream.write(b"HTTP/1.1 200 OK\r\n\r\n");
         }
         Ok(())
     }
