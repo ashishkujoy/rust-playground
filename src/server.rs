@@ -1,6 +1,7 @@
 
-use std::net::TcpListener;
+use std::net::{TcpListener, TcpStream};
 use std::error::Error;
+use std::io::prelude::*;
 
 pub struct Server {
     host: &'static str,
@@ -12,8 +13,15 @@ impl Server {
         Server { host, port }
     }
 
-    pub fn start(&self) -> Result<(), Box<dyn Error>> {
-        TcpListener::bind(format!("{}:{}", self.host, self.port))?;
+    pub fn start<H>(&self, handler: H) -> Result<(), Box<dyn Error>> where H : TcpRequestHandler{
+        let listener = TcpListener::bind(format!("{}:{}", self.host, self.port))?;
+        for stream in listener.incoming() {
+            handler.handle_request(stream.unwrap())
+        }
         Ok(())
     }
+}
+
+pub trait TcpRequestHandler {
+    fn handle_request(&self, stream: TcpStream) -> ();
 }

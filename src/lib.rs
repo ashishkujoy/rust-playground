@@ -4,6 +4,7 @@ mod refcell;
 mod list;
 mod list2;
 pub mod server;
+pub mod http;
 
 #[cfg(test)]
 mod tests {
