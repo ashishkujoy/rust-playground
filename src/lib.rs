@@ -1,10 +1,10 @@
 mod cell;
-mod rc;
-mod refcell;
+pub mod http;
 mod list;
 mod list2;
+mod rc;
+mod refcell;
 pub mod server;
-pub mod http;
 
 #[cfg(test)]
 mod tests {

@@ -1,10 +1,12 @@
+use quick_bytes::{
+    http::HttpRequest,
+    server::{Server, TcpRequestHandler},
+};
 use std::{net::TcpStream, process};
-use quick_bytes::{http::HttpRequest, server::{Server, TcpRequestHandler}};
-
 
 fn main() {
     let server = Server::new("127.0.0.1", "7878");
-    match server.start(DummyHandler{}) {
+    match server.start(DummyHandler {}) {
         Ok(_) => {}
         Err(error) => {
             let des = error.to_string();
@@ -16,7 +18,5 @@ fn main() {
 
 struct DummyHandler {}
 impl TcpRequestHandler for DummyHandler {
-    fn handle_request(&self, http_request: HttpRequest) -> () {
-        
-    }
+    fn handle_request(&self, http_request: HttpRequest) -> () {}
 }

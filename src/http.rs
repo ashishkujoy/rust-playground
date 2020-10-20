@@ -1,20 +1,17 @@
-use core::fmt::Formatter;
 use core::fmt::Display;
+use core::fmt::Formatter;
 use core::fmt::Result as FmtResult;
 use std::{error::Error, fmt};
 
 #[derive(Debug, PartialEq)]
 pub struct HttpRequest {
     method: HttpMethod,
-    path: String
+    path: String,
 }
 
 impl HttpRequest {
     fn new(method: HttpMethod, path: String) -> Self {
-        HttpRequest {
-            method,
-            path
-        }
+        HttpRequest { method, path }
     }
 
     pub(crate) fn parse(request: String) -> Result<HttpRequest, HttpParseError> {
@@ -25,17 +22,25 @@ impl HttpRequest {
         let method = match tokens.next() {
             Some("GET") => HttpMethod::GET,
             Some("POST") => HttpMethod::POST,
-            _ => return Err(HttpParseError{cause: HttpParseErrorCause::MethodNotFound})
+            _ => {
+                return Err(HttpParseError {
+                    cause: HttpParseErrorCause::MethodNotFound,
+                })
+            }
         };
 
         let path = match tokens.next() {
             Some(path) => path,
-            None => return Err(HttpParseError{cause: HttpParseErrorCause::PathNotPresent})
+            None => {
+                return Err(HttpParseError {
+                    cause: HttpParseErrorCause::PathNotPresent,
+                })
+            }
         };
 
         Ok(HttpRequest {
             method,
-            path: path.to_string()
+            path: path.to_string(),
         })
     }
 }
@@ -48,7 +53,7 @@ pub struct HttpParseError {
 #[derive(Debug, PartialEq)]
 enum HttpParseErrorCause {
     MethodNotFound,
-    PathNotPresent
+    PathNotPresent,
 }
 
 impl Display for HttpParseError {
@@ -81,7 +86,12 @@ mod test {
         let raw_request = "Request: FOO /helloworld HTTP/1.1\r\n";
         let request = HttpRequest::parse(raw_request.to_string());
 
-        assert_eq!(request, Err(HttpParseError{cause: HttpParseErrorCause::MethodNotFound}));
+        assert_eq!(
+            request,
+            Err(HttpParseError {
+                cause: HttpParseErrorCause::MethodNotFound
+            })
+        );
     }
 
     #[test]
@@ -89,7 +99,12 @@ mod test {
         let raw_request = "Request:\r\n";
         let request = HttpRequest::parse(raw_request.to_string());
 
-        assert_eq!(request, Err(HttpParseError{cause: HttpParseErrorCause::MethodNotFound}));
+        assert_eq!(
+            request,
+            Err(HttpParseError {
+                cause: HttpParseErrorCause::MethodNotFound
+            })
+        );
     }
 
     #[test]
@@ -97,6 +112,11 @@ mod test {
         let raw_request = "Request: POST\r\n";
         let request = HttpRequest::parse(raw_request.to_string());
 
-        assert_eq!(request, Err(HttpParseError{cause: HttpParseErrorCause::PathNotPresent}));
+        assert_eq!(
+            request,
+            Err(HttpParseError {
+                cause: HttpParseErrorCause::PathNotPresent
+            })
+        );
     }
 }

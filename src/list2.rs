@@ -13,22 +13,22 @@ impl<T> List<T> {
     fn append(&self, t: T) -> Self {
         let head = Node {
             element: t,
-            next: self.head.clone()
+            next: self.head.clone(),
         };
         List {
-            head : Some(Rc::new(head))
+            head: Some(Rc::new(head)),
         }
     }
 
     fn tail(&self) -> Self {
         List {
-            head: self.head.as_ref().and_then(|node| node.next.clone())
+            head: self.head.as_ref().and_then(|node| node.next.clone()),
         }
     }
 
     fn head(&self) -> Option<&T> {
         self.head.as_ref().map(|node| &node.element)
-    }   
+    }
 }
 
 type Link<T> = Option<Rc<Node<T>>>;
@@ -47,9 +47,9 @@ mod test {
         let list: List<i32> = List::new();
 
         assert_eq!(list.head(), None);
-        assert_eq!(list.append(2).head(), Some(& 2));
+        assert_eq!(list.append(2).head(), Some(&2));
     }
- 
+
     #[test]
     fn append() {
         let list: List<i32> = List::new();
@@ -58,8 +58,8 @@ mod test {
         let list3 = list2.append(2);
 
         assert_eq!(list.head(), None);
-        assert_eq!(list2.head(), Some(& 1));
-        assert_eq!(list3.head(), Some(& 2));
+        assert_eq!(list2.head(), Some(&1));
+        assert_eq!(list3.head(), Some(&2));
     }
 
     #[test]
