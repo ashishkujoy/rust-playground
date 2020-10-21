@@ -1,46 +1,69 @@
 use core::fmt::Display;
 use core::fmt::Formatter;
 use core::fmt::Result as FmtResult;
-use std::{error::Error, fmt};
+use std::collections::HashMap;
 
 #[derive(Debug, PartialEq)]
 pub struct HttpRequest {
     method: HttpMethod,
     path: String,
+    headers: HashMap<String, String>,
 }
 
 impl HttpRequest {
-    fn new(method: HttpMethod, path: String) -> Self {
-        HttpRequest { method, path }
+    fn new(method: HttpMethod, path: String, headers: HashMap<String, String>) -> Self {
+        HttpRequest {
+            method,
+            path,
+            headers,
+        }
     }
 
     pub(crate) fn parse(request: String) -> Result<HttpRequest, HttpParseError> {
-        let request_line = request.split("\r\n").take(1).next().unwrap();
+        let mut lines = request.split("\r\n");
+        let request_line = lines.next().unwrap();
         let mut tokens = request_line.split(" ");
-        
-        let method = match tokens.next() {
-            Some("GET") => HttpMethod::GET,
-            Some("POST") => HttpMethod::POST,
+
+        let method = Self::parse_request_method(tokens.next())?;
+        let path = Self::parse_request_path(tokens.next())?;
+
+        let mut headers: HashMap<String, String> = HashMap::new();
+
+        for header_line in lines {
+            let mut tokens = header_line.split(": ");
+            let header_name = tokens.next().unwrap();
+            let header_value = tokens.next().unwrap();
+            headers.insert(header_name.to_string(), header_value.to_string());
+        }
+
+        Ok(HttpRequest {
+            method,
+            path: path.to_string(),
+            headers: headers,
+        })
+    }
+
+    fn parse_request_method(method_token: Option<&str>) -> Result<HttpMethod, HttpParseError> {
+        match method_token {
+            Some("GET") => Ok(HttpMethod::GET),
+            Some("POST") => Ok(HttpMethod::POST),
             _ => {
                 return Err(HttpParseError {
                     cause: HttpParseErrorCause::MethodNotFound,
                 })
             }
-        };
+        }
+    }
 
-        let path = match tokens.next() {
-            Some(path) => path,
+    fn parse_request_path(path_token: Option<&str>) -> Result<&str, HttpParseError> {
+        match path_token {
+            Some(path) => Ok(path),
             None => {
                 return Err(HttpParseError {
                     cause: HttpParseErrorCause::PathNotPresent,
                 })
             }
-        };
-
-        Ok(HttpRequest {
-            method,
-            path: path.to_string(),
-        })
+        }
     }
 }
 
@@ -117,5 +140,18 @@ mod test {
                 cause: HttpParseErrorCause::PathNotPresent
             })
         );
+    }
+
+    #[test]
+    fn parse_headers() {
+        let raw_request = "GET /helloworld HTTP/1.1\r\nHost: localhost:7878\r\nUser-Agent: curl/7.64.1\r\nAccept: */*";
+        let mut headers: HashMap<String, String> = HashMap::new();
+        headers.insert("User-Agent".to_string(), "curl/7.64.1".to_string());
+        headers.insert("Accept".to_string(), "*/*".to_string());
+        headers.insert("Host".to_string(), "localhost:7878".to_string());
+
+        let request = HttpRequest::parse(raw_request.to_string()).unwrap();
+
+        assert_eq!(request.headers, headers)
     }
 }
