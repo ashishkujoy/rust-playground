@@ -31,8 +31,12 @@ impl HttpRequest {
 
         for header_line in lines {
             let mut tokens = header_line.split(": ");
-            let header_name = tokens.next().unwrap();
-            let header_value = tokens.next().unwrap();
+            let header_name = tokens
+                .next()
+                .ok_or(HttpParseError::malform_header("Header name not present"))?;
+            let header_value = tokens
+                .next()
+                .ok_or(HttpParseError::malform_header("Header value not present"))?;
             headers.insert(header_name.to_string(), header_value.to_string());
         }
 
@@ -76,6 +80,15 @@ pub struct HttpParseError {
 enum HttpParseErrorCause {
     MethodNotFound,
     PathNotPresent,
+    MalformHeader(String),
+}
+
+impl HttpParseError {
+    fn malform_header(cause: &str) -> Self {
+        HttpParseError {
+            cause: HttpParseErrorCause::MalformHeader(cause.to_string()),
+        }
+    }
 }
 
 impl Display for HttpParseError {
@@ -153,5 +166,16 @@ mod test {
         let request = HttpRequest::parse(raw_request.to_string()).unwrap();
 
         assert_eq!(request.headers, headers)
+    }
+
+    #[test]
+    fn give_error_for_malformed_header() {
+        let raw_request = "GET /helloworld HTTP/1.1\r\nHost";
+
+        let request = HttpRequest::parse(raw_request.to_string());
+        assert_eq!(
+            request,
+            Err(HttpParseError::malform_header("Header value not present"))
+        )
     }
 }
