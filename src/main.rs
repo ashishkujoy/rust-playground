@@ -1,6 +1,7 @@
+use quick_bytes::response::HttpResponse;
 use quick_bytes::{
     request::HttpRequest,
-    server::{Server, TcpRequestHandler},
+    server::{HttpRequestHandler, Server},
 };
 use std::process;
 
@@ -17,8 +18,13 @@ fn main() {
 }
 
 struct DummyHandler {}
-impl TcpRequestHandler for DummyHandler {
-    fn handle_request(&self, http_request: HttpRequest) -> () {
-        println!("{:?}", http_request)
+impl HttpRequestHandler for DummyHandler {
+    fn handle_request(&self, http_request: &HttpRequest, http_response: &mut HttpResponse) -> () {
+        println!("{:?}", http_request);
+        if http_request.path == "/bad" {
+            http_response.set_status(400);
+        } else {
+            http_response.set_status(200);
+        }
     }
 }
