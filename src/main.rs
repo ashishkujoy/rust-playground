@@ -1,8 +1,8 @@
 use quick_bytes::{
-    http::HttpRequest,
+    request::HttpRequest,
     server::{Server, TcpRequestHandler},
 };
-use std::{net::TcpStream, process};
+use std::process;
 
 fn main() {
     let server = Server::new("127.0.0.1", "7878");

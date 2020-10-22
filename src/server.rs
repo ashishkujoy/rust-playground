@@ -1,7 +1,7 @@
-use crate::http::HttpRequest;
+use crate::request::HttpRequest;
 use std::error::Error;
 use std::io::prelude::*;
-use std::net::{TcpListener, TcpStream};
+use std::net::TcpListener;
 
 pub struct Server {
     host: &'static str,
