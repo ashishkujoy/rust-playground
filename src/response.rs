@@ -1,14 +1,16 @@
+use crate::http_status_code::HttpStatus;
+
 pub struct HttpResponse {
-    pub status_code: u16,
+    pub status: HttpStatus,
 }
 
 impl HttpResponse {
-    pub fn new(status_code: u16) -> Self {
-        HttpResponse { status_code }
+    pub fn new(status: HttpStatus) -> Self {
+        HttpResponse { status }
     }
 
-    pub fn set_status(&mut self, status_code: u16) {
-        self.status_code = status_code;
+    pub fn set_status(&mut self, status: HttpStatus) {
+        self.status = status;
     }
 }
 
@@ -18,9 +20,9 @@ mod test {
 
     #[test]
     fn should_update_status_code() {
-        let mut http_response = HttpResponse::new(200);
-        http_response.set_status(404);
+        let mut http_response = HttpResponse::new(HttpStatus::ok());
+        http_response.set_status(HttpStatus::not_found());
 
-        assert_eq!(http_response.status_code, 404);
+        assert_eq!(http_response.status, HttpStatus::not_found());
     }
 }

@@ -1,5 +1,5 @@
-use crate::request::HttpRequest;
 use crate::response::HttpResponse;
+use crate::{http_status_code::HttpStatus, request::HttpRequest};
 use std::error::Error;
 use std::io::prelude::*;
 use std::net::TcpListener;
@@ -25,9 +25,13 @@ impl Server {
             stream.read(&mut buffer);
             let req = String::from_utf8_lossy(&buffer[..]);
             let request = HttpRequest::parse(req.trim_end()).unwrap();
-            let mut response = HttpResponse::new(404);
+            let mut response = HttpResponse::new(HttpStatus::not_found());
             handler.handle_request(&request, &mut response);
-            let res = format!("HTTP/1.1 {} OK\r\n\r\n", response.status_code);
+            let res = format!(
+                "HTTP/1.1 {} {}\r\n\r\n",
+                response.status.code,
+                response.status.get_description()
+            );
             stream.write(res.as_bytes());
         }
         Ok(())

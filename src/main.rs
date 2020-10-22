@@ -1,4 +1,4 @@
-use quick_bytes::response::HttpResponse;
+use quick_bytes::{http_status_code::HttpStatus, response::HttpResponse};
 use quick_bytes::{
     request::HttpRequest,
     server::{HttpRequestHandler, Server},
@@ -22,9 +22,9 @@ impl HttpRequestHandler for DummyHandler {
     fn handle_request(&self, http_request: &HttpRequest, http_response: &mut HttpResponse) -> () {
         println!("{:?}", http_request);
         if http_request.path == "/bad" {
-            http_response.set_status(400);
+            http_response.set_status(HttpStatus::not_found());
         } else {
-            http_response.set_status(200);
+            http_response.set_status(HttpStatus::ok());
         }
     }
 }
