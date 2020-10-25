@@ -2,11 +2,16 @@ use crate::http_status_code::HttpStatus;
 
 pub struct HttpResponse {
     pub status: HttpStatus,
+    pub body: Option<String>
 }
 
 impl HttpResponse {
     pub fn new(status: HttpStatus) -> Self {
-        HttpResponse { status }
+        HttpResponse { status, body: None }
+    }
+
+    pub fn write(&mut self, body: String) {
+        self.body = Some(body)
     }
 
     pub fn set_status(&mut self, status: HttpStatus) {
