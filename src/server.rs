@@ -1,5 +1,6 @@
+use crate::http_status_code::HttpStatus;
+use crate::request::HttpRequest;
 use crate::response::HttpResponse;
-use crate::{http_status_code::HttpStatus, request::HttpRequest};
 use std::error::Error;
 use std::io::prelude::*;
 use std::net::TcpListener;

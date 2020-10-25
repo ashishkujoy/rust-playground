@@ -2,7 +2,7 @@ use crate::http_status_code::HttpStatus;
 
 pub struct HttpResponse {
     pub status: HttpStatus,
-    pub body: Option<String>
+    pub body: Option<String>,
 }
 
 impl HttpResponse {
@@ -17,6 +17,8 @@ impl HttpResponse {
     pub fn set_status(&mut self, status: HttpStatus) {
         self.status = status;
     }
+
+    pub fn set_header(&mut self, name: &str, value: &str) {}
 }
 
 #[cfg(test)]
