@@ -18,7 +18,7 @@ impl HttpResponse {
         self.status = status;
     }
 
-    pub fn set_header(&mut self, name: &str, value: &str) {}
+    pub fn set_header(&mut self, _name: &str, _value: &str) {}
 }
 
 #[cfg(test)]

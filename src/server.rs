@@ -29,9 +29,10 @@ impl Server {
             let mut response = HttpResponse::new(HttpStatus::not_found());
             handler.handle_request(&request, &mut response);
             let res = format!(
-                "HTTP/1.1 {} {}\r\n\r\n",
+                "HTTP/1.1 {} {}\r\n\r\n{:?}",
                 response.status.code,
-                response.status.get_description()
+                response.status.get_description(),
+                response.body.unwrap_or_default()
             );
             stream.write(res.as_bytes());
         }

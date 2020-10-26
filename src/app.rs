@@ -6,35 +6,31 @@ use crate::{
 };
 use std::collections::HashMap;
 
-struct App<H> {
-    get_routes: Box<HashMap<String, H>>,
-    post_routes: Box<HashMap<String, H>>,
+type RequestHandler = Box<dyn Fn(&HttpRequest, &mut HttpResponse)>;
+
+pub struct App {
+    get_routes: HashMap<String, RequestHandler>,
+    post_routes: HashMap<String, RequestHandler>,
 }
 
-impl<H> App<H>
-where
-    H: HttpRequestHandler,
-{
-    pub fn new() -> Self {
+impl App {
+    pub fn new(initial_capacity: usize) -> Self {
         App {
-            get_routes: Box::new(HashMap::default()),
-            post_routes: Box::new(HashMap::default()),
+            get_routes: HashMap::with_capacity(initial_capacity / 2),
+            post_routes: HashMap::with_capacity(initial_capacity / 2),
         }
     }
 
-    pub fn get(&mut self, path: String, h: H) {
+    pub fn get(&mut self, path: String, h: RequestHandler) {
         self.get_routes.insert(path, h);
     }
 
-    pub fn post(&mut self, path: String, h: H) {
+    pub fn post(&mut self, path: String, h: RequestHandler) {
         self.post_routes.insert(path, h);
     }
 }
 
-impl<H> HttpRequestHandler for App<H>
-where
-    H: HttpRequestHandler,
-{
+impl HttpRequestHandler for App {
     fn handle_request(&self, req: &HttpRequest, res: &mut HttpResponse) {
         let handler = if req.method == HttpMethod::POST {
             self.post_routes.get(&req.path)
@@ -42,8 +38,10 @@ where
             self.get_routes.get(&req.path)
         };
 
+
         if let Some(handler) = handler {
-            handler.handle_request(req, res)
+            handler(req, res);
+            
         } else {
             res.write("{\"body\": \"Requested resource not found\"}".to_string());
             res.set_header("content-type", "application/json");
